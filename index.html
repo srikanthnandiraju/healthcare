@@ -148,6 +148,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js" type="text/javascript">
     </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js">
+    </script>
     <template id="timeline_event">
         {{#items}}
         <li>
@@ -179,8 +181,23 @@
         {{/items}}
     </template>
     <script>
-        // $(document).ready(function () {
-        // });
+        $(document).ready(function () {
+
+            var public_spreadsheet_url =
+                'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnP-UotwfN2jnk1SiFQyZexD6s07JLQ7h7SOIYSOqLS1Y2gd_fovHnqaveJ2Uf2UwClOmBYmRdSJRO/pub?output=csv';
+
+            Papa.parse(public_spreadsheet_url, {
+                download: true,
+                header: true,
+                complete: showInfo
+            });
+
+            function showInfo(results) {
+                var data = results.data
+                renderUI(data);
+            }
+
+        });
 
         function renderUI(items) {
             var template = $('#timeline_event').html();
@@ -189,32 +206,6 @@
             });
             $("#holder").html(html);
         }
-
-        function fetchTimeline() {
-            var url =
-                "https://us-central1-nandiraju-api.cloudfunctions.net/app?key=1pOkd492WZWhvG_hCEsc7KuqJgMl1uIB722749faImBQ";
-            fetch(url)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    // console.log(data.timeline);
-                    data.timeline.forEach(oneItem => {
-                        let tags = oneItem.tags;
-                        if (tags) {
-                            let arr = tags.split(",");
-                            oneItem.taglist = arr;
-                        } else {
-                            oneItem.taglist = ['nandiraju'];
-                        }
-                    });
-                    renderUI(data.timeline);
-                })
-                .catch((err) => {
-                    alert("Error fetching data");
-                });
-        }
-        fetchTimeline();
     </script>
 </body>
 
